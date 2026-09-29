@@ -63,7 +63,7 @@ void InfoBar::updateText()
     switch (m_state) {
         case GameState::Playing:
             status = "Playing";
-            color = "blue";
+            color = "white";
             break;
         case GameState::Won:
             status = "Victory!";
