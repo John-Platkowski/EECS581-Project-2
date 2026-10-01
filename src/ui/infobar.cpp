@@ -78,3 +78,18 @@ void InfoBar::updateText()
     setStyleSheet(QString("color: %1;").arg(color));
     setText(QString("Mines: %1    Time: %2    %3").arg(m_mineCount).arg(m_time, 2, 10, QChar('0')).arg(status));
 }
+
+// Added with assistance from ChatGPT (OpenAI), 2026-10-01.
+// Scales the InfoBar font using the grid width so the text grows and shrinks
+// with the game window.
+void InfoBar::setScale(int gridWidth)
+{
+    QFont font = this->font();
+
+    // Use approximately 3.5% of the grid width for the font size while
+    // preventing the text from becoming too small.
+    font.setPointSize(qMax(8, static_cast<int>(gridWidth * 0.035)));
+    font.setBold(true);
+
+    setFont(font);
+}

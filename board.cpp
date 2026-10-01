@@ -68,12 +68,13 @@ const Cell& Board::getCell(int r, int c) const{
 // Toggles the flag state also changing the flagCount.
 void Board::toggleFlag(int r, int c){
     if(isValidCoordinate(r,c)){
-        if (board[r][c].state == CellState::COVERED) {
+        if (board[r][c].state == CellState::COVERED && flagCount < getTotalMines()) {
             flagCount++;
+            board[r][c].toggleFlag();
         } else if (board[r][c].state == CellState::FLAGGED) {
             flagCount--;
+            board[r][c].toggleFlag();
         }
-        board[r][c].toggleFlag();
     }
 
 }

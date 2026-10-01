@@ -43,6 +43,10 @@ public:
     // Elapsed game time in seconds. Retained from the original InfoBar for the
     // timer feature; not yet driven by a QTimer.
     void setTime(int seconds);
+    
+    // Added with assistance from ChatGPT (OpenAI), 2026-10-01.
+    // Allows the InfoBar text to scale based on the Minesweeper grid size.
+    void setScale(int gridWidth);
 
 private:
     int m_mineCount = 0;

@@ -104,13 +104,11 @@ void Window::promptNewGame()
     m_gridWidget->startNewGame(askMineCount());
 }
 
+// Added with assistance from ChatGPT (OpenAI), 2026-10-01.
+// Uses the current grid width as the reference for scaling the InfoBar text.
 void Window::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
 
-    //get min of window width/height and set grid to it
-    int side = qMin(width(), height());
-    side = qMax(side, 300); // prevent grid from becoming too small
-
-    m_gridWidget->setFixedSize(side, side);
+    m_infoBar->setScale(m_gridWidget->width());
 }
