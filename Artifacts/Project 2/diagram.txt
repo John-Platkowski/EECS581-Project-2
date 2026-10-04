@@ -1,0 +1,90 @@
+@startuml
+left to right direction
+
+title Minesweeper - User Interaction and Game Logic Overview
+
+actor Player
+
+rectangle "Minesweeper" {
+
+    rectangle "Game Setup" {
+        usecase "Start New Game" as NewGame
+        usecase "Select Mine Count" as MineCount
+        usecase "Select Game Mode" as GameMode
+    }
+
+    rectangle "Generic Minesweeper" {
+        usecase "Generate Board" as GenerateBoard
+        usecase "Click Square" as ClickSquare
+        usecase "Check Square" as CheckSquare
+        usecase "Reveal Square" as Reveal
+        usecase "Flag / Unflag Square" as Flag
+        usecase "Evaluate Game State" as GameState
+        usecase "Win Game" as Win
+        usecase "Lose Game" as Lose
+    }
+
+    rectangle "AI Mode" {
+        usecase "Select AI" as SelectAI
+        usecase "AI Takes Turn" as AITurn
+    }
+
+    rectangle "Timer Mode" {
+        usecase "Update Timer" as UpdateTimer
+        usecase "Add Time After Click" as AddTime
+        usecase "Complete Board" as CompleteBoard
+        usecase "Increase Difficulty" as IncreaseDifficulty
+        usecase "Start New Board" as NewBoard
+    }
+
+    usecase "Update Display" as Display
+}
+
+' Game Setup
+Player --> NewGame
+
+NewGame ..> MineCount : <<include>>
+NewGame ..> GameMode : <<include>>
+
+GameMode --> GenerateBoard
+GenerateBoard --> ClickSquare
+
+' Generic Minesweeper
+Player --> ClickSquare
+
+ClickSquare --> CheckSquare
+CheckSquare --> Reveal
+CheckSquare --> Flag
+
+Reveal --> GameState
+Flag --> GameState
+
+Win ..> GameState : <<extend>>
+Lose ..> GameState : <<extend>>
+
+' AI Mode
+GameMode --> SelectAI
+SelectAI --> AITurn
+
+ClickSquare --> AITurn : AI mode
+AITurn --> ClickSquare
+
+' Timer Mode
+GameMode ..> UpdateTimer : <<extend>>
+
+ClickSquare --> AddTime : Timer mode
+AddTime --> UpdateTimer
+
+UpdateTimer --> GameState : when time expires
+
+GameState ..> CompleteBoard : <<extend>>
+CompleteBoard --> IncreaseDifficulty
+IncreaseDifficulty --> NewBoard
+NewBoard --> GenerateBoard
+
+' Display
+GameState --> Display
+
+Display --> Player
+
+@enduml
