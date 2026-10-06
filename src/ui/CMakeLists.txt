@@ -23,6 +23,8 @@ add_library(ui STATIC
     infobar.h
     infobar.cpp
     ${CMAKE_SOURCE_DIR}/resources.qrc
+    ${CMAKE_SOURCE_DIR}/gameTimer.cpp
+    ${CMAKE_SOURCE_DIR}/gameTimer.h
 )
 
 # PUBLIC so the executable inherits both the Qt and game-rule include paths.

@@ -38,6 +38,9 @@ Window::Window(QWidget *parent)
 
     // Ask for the mine count and deal the first board.
     m_gridWidget->startNewGame(askMineCount());
+    // Start running the timer 
+    m_gameTimer->reset();
+    m_gameTimer->start();
 }
 
 Window::~Window() = default;
@@ -51,6 +54,8 @@ void Window::setupUi()
     // create grid and scoreboard
     m_gridWidget = new GridWidget(central);
     m_infoBar = new InfoBar(central);
+    //Create timer 
+    m_gameTimer = new GameTimer(this);
 
     m_newGameButton = new QPushButton("New Game", central);
     m_newGameButton->setFixedHeight(40);
@@ -62,6 +67,9 @@ void Window::setupUi()
             m_infoBar, &InfoBar::setStatus);
     connect(m_newGameButton, &QPushButton::clicked,
             this, &Window::promptNewGame);
+    //Connect the timer class to the timer UI
+    connect(m_gameTimer, &GameTimer::timeChanged,
+        m_infoBar, &InfoBar::setTime);
 
     // group infobar, grid and button together
     auto *gameLayout = new QVBoxLayout();
@@ -102,6 +110,9 @@ int Window::askMineCount()
 void Window::promptNewGame()
 {
     m_gridWidget->startNewGame(askMineCount());
+    //Restart timer on new game
+    m_gameTimer->reset();
+    m_gameTimer->start();
 }
 
 // Added with assistance from ChatGPT (OpenAI), 2026-10-01.

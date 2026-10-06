@@ -20,6 +20,7 @@
 
 #include <QMainWindow>
 #include <QLabel>
+#include "gametimer.h"
 
 class GridWidget;
 class InfoBar;
@@ -50,6 +51,7 @@ private:
     GridWidget *m_gridWidget = nullptr;
     InfoBar *m_infoBar = nullptr;
     QPushButton *m_newGameButton = nullptr;
+    GameTimer *m_gameTimer;
 };
 
 #endif

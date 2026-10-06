@@ -5,7 +5,7 @@
 #include <QTimer>
 
 class GameTimer : public QObject {
-    QObject
+    Q_OBJECT
 
     public:
         explicit GameTimer(QObject *parent = nullptr);
@@ -17,7 +17,6 @@ class GameTimer : public QObject {
         void addTime(int seconds);
         int getTime();
 
-        void updateTime();
         void revealSquare();
         void correctFlag();
         void incorrectFlag();
@@ -31,6 +30,6 @@ class GameTimer : public QObject {
     private:
         QTimer timer;
         int elapsedTime;
-}
+};
 
 #endif
