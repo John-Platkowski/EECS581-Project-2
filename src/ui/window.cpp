@@ -30,7 +30,7 @@
 Window::Window(QWidget *parent)
     : QMainWindow(parent)
 {
-    setMinimumSize(300, 400);
+    setMinimumSize(400, 400);
     resize(600,700);
 
     // create ui
@@ -120,6 +120,5 @@ void Window::promptNewGame()
 void Window::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
-
-    m_infoBar->setScale(m_gridWidget->width());
+    
 }

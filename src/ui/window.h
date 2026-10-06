@@ -20,7 +20,7 @@
 
 #include <QMainWindow>
 #include <QLabel>
-#include "gametimer.h"
+#include "gameTimer.h"
 
 class GridWidget;
 class InfoBar;

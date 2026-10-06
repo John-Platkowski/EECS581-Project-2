@@ -76,7 +76,7 @@ void InfoBar::updateText()
     }
 
     setStyleSheet(QString("color: %1;").arg(color));
-    setText(QString("Mines: %1    Time: %2    %3").arg(m_mineCount).arg(m_time, 2, 10, QChar('0')).arg(status));
+    setText(QString("Mines: %1    Time: %2    %3").arg(m_mineCount).arg(m_time, 3, 10, QChar('0')).arg(status));
 }
 
 // Added with assistance from ChatGPT (OpenAI), 2026-10-01.
