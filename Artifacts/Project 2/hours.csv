@@ -1,2 +1,4 @@
-Date,Start Time,End Time,Hours,Task,Notes
-10/1/2026, 11:00am, 12:30am, 1h30, Fixed some bugs & basic UML/architecture diagrams
+Name, Date,Start Time,End Time,Hours,Task,Notes
+Josh, 10/1/2026, 11:00am, 12:30am, 1h30, Fixed some bugs & basic UML/architecture diagrams
+
+Tyler, 10/6/2026, 2:30pm, 3:00pm, 30m, Connected UI to timer class
