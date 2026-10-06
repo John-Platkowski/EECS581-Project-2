@@ -65,6 +65,9 @@ void Window::setupUi()
             m_infoBar, &InfoBar::setMineCount);
     connect(m_gridWidget, &GridWidget::statusChanged,
             m_infoBar, &InfoBar::setStatus);
+    //Call the game end function when the game status is emited
+    connect(m_gridWidget, &GridWidget::statusChanged,
+        this, &Window::gameEnd);
     connect(m_newGameButton, &QPushButton::clicked,
             this, &Window::promptNewGame);
     //Connect the timer class to the timer UI
@@ -115,10 +118,20 @@ void Window::promptNewGame()
     m_gameTimer->start();
 }
 
+//10/6/2026 Tyler Oswald
+//This function is used to stop the timer when the game state chages
+void Window::gameEnd(GameState state)
+{
+    //If the game has been lost or won, we need to stop the timer
+    if (state == GameState::Lost || state == GameState::Won) {
+        m_gameTimer->stop();
+    }
+}
+
 // Added with assistance from ChatGPT (OpenAI), 2026-10-01.
 // Uses the current grid width as the reference for scaling the InfoBar text.
 void Window::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
-    
+
 }
