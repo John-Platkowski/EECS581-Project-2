@@ -37,6 +37,9 @@ void LogicHandler::reset(int numMines) {
     board = Board(numMines);
     m_state = GameState::Playing;
     m_minesPlaced = false;
+
+    m_gameTimer.reset();
+    m_gameTimer.start();
 }
 
  // how many flags the player still has to place
@@ -88,6 +91,8 @@ CellList LogicHandler::handleClick(int row, int col, ClickType clickType) {
         board.uncoverCell(row, col); // uncover it
         changedCells.emplace_back(row, col);
         m_state = GameState::Lost; // mark it for repaint
+        m_gameTimer.stop();
+
         revealAllMines(changedCells); // expose every other mine for the game-over view
         return changedCells;
     }
@@ -104,6 +109,7 @@ CellList LogicHandler::handleClick(int row, int col, ClickType clickType) {
     // any successful uncover may have completed the board.
     if (allSafeCellsUncovered()) {
         m_state = GameState::Won;
+        m_gameTimer.stop();
     }
     return changedCells;
 
@@ -220,4 +226,11 @@ bool LogicHandler::allSafeCellsUncovered() const {
         }
     }
     return true;
+}
+
+// 10/6/2026 Tyler Oswald
+//This function is used by the UI to get the current time 
+GameTimer* LogicHandler::getGameTimer()
+{
+    return &m_gameTimer;
 }

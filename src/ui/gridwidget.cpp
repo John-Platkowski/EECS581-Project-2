@@ -23,6 +23,7 @@
  */
 #include "gridwidget.h"
 #include "tile.h"
+#include "gameTimer.h"
 
 #include <QGridLayout>
 #include <QLabel>
@@ -33,6 +34,7 @@ GridWidget::GridWidget(QWidget *parent)
       m_logic(m_board)
 {
     setupUi();
+    connect(m_logic.getGameTimer(), &GameTimer::timeChanged, this, &GridWidget::timeChanged);
 }
 
 // draws the grid: column letters A-J across the top, row numbers 1-10 down the

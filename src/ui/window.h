@@ -20,8 +20,6 @@
 
 #include <QMainWindow>
 #include <QLabel>
-#include "gameTimer.h"
-#include "logicHandler.h"
 
 class GridWidget;
 class InfoBar;
@@ -41,7 +39,6 @@ protected:
 private slots:
     // Prompts for a mine count and restarts the game with it.
     void promptNewGame();
-    void gameEnd(GameState state);
 
 private:
     void setupUi();
@@ -53,7 +50,6 @@ private:
     GridWidget *m_gridWidget = nullptr;
     InfoBar *m_infoBar = nullptr;
     QPushButton *m_newGameButton = nullptr;
-    GameTimer *m_gameTimer;
 };
 
 #endif

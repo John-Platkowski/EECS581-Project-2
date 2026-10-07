@@ -53,6 +53,8 @@ signals:
     // Emitted when the game transitions between Playing / Won / Lost.
     void statusChanged(GameState state);
 
+    void timeChanged(int seconds);
+
 private slots:
     void handleTileClicked(Tile *tile, Qt::MouseButton clickType);
 

@@ -20,6 +20,7 @@
 #define LOGIC_HANDLER_H
 
 #include "board.h"
+#include "gameTimer.h"
 
 #include <random>
 #include <utility>
@@ -61,11 +62,16 @@ public:
     // true until the first left click has placed the mines.
     bool minesPlaced() const { return m_minesPlaced; }
 
+    // Getter for the time
+    // This will be used by the UI
+    GameTimer* getGameTimer();
+    
 private:
     Board& board;          // board manager this handler drives.
     GameState m_state;     // Playing / Won / Lost.
     bool m_minesPlaced;    // =first-click-safe placement.
     std::mt19937 m_rng;    // seeded once per handler for random mine layout.
+    GameTimer m_gameTimer;
 
     // randomly places board.getTotalMines() mines, never on (safeRow, safeCol)
     // none any of its eight neighbours, guaranteeing a safe opening click.

@@ -27,6 +27,7 @@ add_library(core STATIC
 
 # Anything linking `core` can include "board.h" / "logicHandler.h" directly.
 target_include_directories(core PUBLIC ${CMAKE_SOURCE_DIR})
+target_link_libraries(core PUBLIC Qt6::Core)
 
 # qt_standard_project_setup() turns AUTOMOC/AUTOUIC on for every target, but
 # `core` contains no Q_OBJECT classes and no Qt headers at all, so running the

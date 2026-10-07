@@ -38,9 +38,6 @@ Window::Window(QWidget *parent)
 
     // Ask for the mine count and deal the first board.
     m_gridWidget->startNewGame(askMineCount());
-    // Start running the timer 
-    m_gameTimer->reset();
-    m_gameTimer->start();
 }
 
 Window::~Window() = default;
@@ -54,8 +51,6 @@ void Window::setupUi()
     // create grid and scoreboard
     m_gridWidget = new GridWidget(central);
     m_infoBar = new InfoBar(central);
-    //Create timer 
-    m_gameTimer = new GameTimer(this);
 
     m_newGameButton = new QPushButton("New Game", central);
     m_newGameButton->setFixedHeight(40);
@@ -65,14 +60,11 @@ void Window::setupUi()
             m_infoBar, &InfoBar::setMineCount);
     connect(m_gridWidget, &GridWidget::statusChanged,
             m_infoBar, &InfoBar::setStatus);
-    //Call the game end function when the game status is emited
-    connect(m_gridWidget, &GridWidget::statusChanged,
-        this, &Window::gameEnd);
     connect(m_newGameButton, &QPushButton::clicked,
             this, &Window::promptNewGame);
-    //Connect the timer class to the timer UI
-    connect(m_gameTimer, &GameTimer::timeChanged,
-        m_infoBar, &InfoBar::setTime);
+    //Connect the the info bar to the game timer
+    connect(m_gridWidget, &GridWidget::timeChanged,
+            m_infoBar, &InfoBar::setTime);
 
     // group infobar, grid and button together
     auto *gameLayout = new QVBoxLayout();
@@ -113,19 +105,6 @@ int Window::askMineCount()
 void Window::promptNewGame()
 {
     m_gridWidget->startNewGame(askMineCount());
-    //Restart timer on new game
-    m_gameTimer->reset();
-    m_gameTimer->start();
-}
-
-//10/6/2026 Tyler Oswald
-//This function is used to stop the timer when the game state chages
-void Window::gameEnd(GameState state)
-{
-    //If the game has been lost or won, we need to stop the timer
-    if (state == GameState::Lost || state == GameState::Won) {
-        m_gameTimer->stop();
-    }
 }
 
 // Added with assistance from ChatGPT (OpenAI), 2026-10-01.
