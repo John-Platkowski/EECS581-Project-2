@@ -65,6 +65,12 @@ public:
     // Getter for the time
     // This will be used by the UI
     GameTimer* getGameTimer();
+
+    //Function for ending the game during the timed mode 
+    void timeExpired();
+
+    //Function used to set the amount of time for the timed mode
+    void setTimeLimit(bool timed, int seconds);
     
 private:
     Board& board;          // board manager this handler drives.

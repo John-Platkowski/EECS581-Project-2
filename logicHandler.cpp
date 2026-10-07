@@ -39,7 +39,6 @@ void LogicHandler::reset(int numMines) {
     m_minesPlaced = false;
 
     m_gameTimer.reset();
-    m_gameTimer.start();
 }
 
  // how many flags the player still has to place
@@ -81,6 +80,8 @@ CellList LogicHandler::handleClick(int row, int col, ClickType clickType) {
         placeMines(row, col);
         computeAdjacency(); // now that mines exist, compute each cell's 0-8 number
         m_minesPlaced = true;
+        //Start timer when the first cell is clicked
+        m_gameTimer.start();
     }
 
     // re-read the cell placement above may have set its adjacency count.
@@ -233,4 +234,30 @@ bool LogicHandler::allSafeCellsUncovered() const {
 GameTimer* LogicHandler::getGameTimer()
 {
     return &m_gameTimer;
+}
+
+//Wrote with the help of ChatGPT (Open AI) - Tyler 10/6/2026
+//This function ends the game when time runs out in the timed mode
+void LogicHandler::timeExpired(){
+    //If the game is already over, we don't need to run this again 
+    if (m_state != GameState::Playing) { 
+        return;
+    }
+
+    //Update the game state to reflect the loss 
+    m_state = GameState::Lost;
+    //Stop the timer 
+    m_gameTimer.stop();
+
+    //Make an empty cellist object to pass to revealAllMines
+    CellList ignored;
+    //Display the remaining mines on game loss 
+    revealAllMines(ignored);
+}
+
+// Tyler - 10/6/2026
+//This function sets the countdown time in the timer class
+void LogicHandler::setTimeLimit(bool timed, int seconds){
+    //Set the time for the timer
+    m_gameTimer.setCountdown(timed, seconds);
 }
