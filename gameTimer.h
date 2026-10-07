@@ -21,6 +21,9 @@ class GameTimer : public QObject {
         void correctFlag();
         void incorrectFlag();
 
+        //Timer that counts down
+        void setCountdown(bool timed, int sec);
+
     signals:
     void timeChanged(int seconds);
 
@@ -30,6 +33,10 @@ class GameTimer : public QObject {
     private:
         QTimer timer;
         int elapsedTime;
+        //Flag to control if timer counts down or not 
+        bool countdown = false;
+        //This sets the amount of time the countdown timer will start with
+        int  startTime = 0;  
 };
 
 #endif

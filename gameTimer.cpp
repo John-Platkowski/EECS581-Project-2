@@ -14,7 +14,9 @@ void GameTimer::stop() {
 
 void GameTimer::reset() {
     timer.stop();
-    elapsedTime = 0;
+    //If the countdown flag is set, we reset to the countdown start time
+    //Otherwise, we count up from 0
+    elapsedTime = countdown ? startTime : 0;
 
     emit timeChanged(elapsedTime);
 }
@@ -32,8 +34,19 @@ int GameTimer::getTime(){
 
 //Updates the timer for each second
 void GameTimer::updateTime() {
-    elapsedTime++;
+    //Count down 
+    if(countdown){
+        elapsedTime += -1;
+    }
+    //Count up
+    else{
+        elapsedTime += 1;
+    }
 
+    //Timer cannot go below 0
+    if (elapsedTime < 0) {
+        elapsedTime = 0; 
+    }
     emit timeChanged(elapsedTime);
 }
 
@@ -51,4 +64,10 @@ void GameTimer::correctFlag() {
     //Prevents user from just clicking randomly to see if the timer increases and knowing where all the mines are
 void GameTimer::incorrectFlag() {
     addTime(-5);
+}
+
+//Setter for countdown vars 
+void GameTimer::setCountdown(bool timed, int sec){
+    countdown = timed;
+    startTime = sec;
 }
