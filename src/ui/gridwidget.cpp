@@ -34,7 +34,7 @@ GridWidget::GridWidget(QWidget *parent)
       m_logic(m_board)
 {
     setupUi();
-    connect(m_logic.getGameTimer(), &GameTimer::timeChanged, this, &GridWidget::timeChanged);
+    connect(m_logic.getGameTimer(), &GameTimer::timeChanged, this, &GridWidget::onTimeChanged);
 }
 
 // draws the grid: column letters A-J across the top, row numbers 1-10 down the
@@ -85,11 +85,39 @@ void GridWidget::setupUi()
 }
 
 // begin a new game: rebuild the board, clear every tile, and republish counters.
-void GridWidget::startNewGame(int numMines)
+// Added a flag for timed mode and what the start time should be - Tyler 10/6/2026
+void GridWidget::startNewGame(int numMines, bool timed, int start_time)
 {
+    //Added logic for setting the countdown timer
+    m_logic.setTimeLimit(timed, start_time);
+
+    //Normal logic for starting a game
     m_logic.reset(numMines);
     refreshAllTiles();
 
+    emit flagsRemainingChanged(m_logic.flagsRemaining());
+    emit statusChanged(m_logic.state());
+}
+
+//Wrote with the help of ChatGPT (OpenAI) - Tyler 10/6/2026
+//This function is connected to a timer. It will pass the time from the timer through to the UI
+//It will also do a check to see if the time has reached zero in the timed game mode
+void GridWidget::onTimeChanged(int seconds){
+
+    //Emit time so that UI can update
+    emit timeChanged(seconds);
+
+    //We don't need to do any extra steps if we are not playing the timed mode or if time is not zero
+    if (!m_timedMode || seconds > 0) {
+        return;
+    }
+
+    //Case for time running out in timed mode 
+    //Run logic for time running out
+    m_logic.timeExpired();
+    //Update the board
+    refreshAllTiles();
+    //Update the status and flag count
     emit flagsRemainingChanged(m_logic.flagsRemaining());
     emit statusChanged(m_logic.state());
 }

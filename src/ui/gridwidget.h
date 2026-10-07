@@ -44,7 +44,7 @@ public:
     static constexpr int kGridSize = 10;
 
     // Clears the board and begins a new game with the given mine count (10-20).
-    void startNewGame(int numMines);
+    void startNewGame(int numMines, bool timed = false, int start_time = 120);
 
 signals:
     // Emitted whenever a flag is placed or removed (total mines - flags placed).
@@ -57,6 +57,7 @@ signals:
 
 private slots:
     void handleTileClicked(Tile *tile, Qt::MouseButton clickType);
+    void onTimeChanged(int seconds);
 
 private:
     void setupUi();
@@ -73,6 +74,7 @@ private:
     // because m_logic binds a reference to it in the constructor's init list.
     Board m_board;
     LogicHandler m_logic;
+    bool m_timedMode = false; 
 };
 
 #endif
