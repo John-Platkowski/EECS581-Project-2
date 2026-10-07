@@ -37,7 +37,7 @@ Window::Window(QWidget *parent)
     setupUi();
 
     // Ask for the mine count and deal the first board.
-    m_gridWidget->startNewGame(askMineCount());
+    m_gridWidget->startNewGame(askMineCount(),true,120);
 }
 
 Window::~Window() = default;
@@ -104,7 +104,7 @@ int Window::askMineCount()
 
 void Window::promptNewGame()
 {
-    m_gridWidget->startNewGame(askMineCount());
+    m_gridWidget->startNewGame(askMineCount(),true,120);
 }
 
 // Added with assistance from ChatGPT (OpenAI), 2026-10-01.
