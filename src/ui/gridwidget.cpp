@@ -88,6 +88,8 @@ void GridWidget::setupUi()
 // Added a flag for timed mode and what the start time should be - Tyler 10/6/2026
 void GridWidget::startNewGame(int numMines, bool timed, int start_time)
 {
+    //Set the flag for if we are playing the timed mode
+    m_timedMode = timed;
     //Added logic for setting the countdown timer
     m_logic.setTimeLimit(timed, start_time);
 
