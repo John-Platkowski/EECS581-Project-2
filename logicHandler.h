@@ -90,13 +90,33 @@ private:
     int countAdjacentMines(int row, int col) const;
 
     // recursively uncovers the region connected to a zero-adjacency cell.
-    void revealConnectedCells(int row, int col, CellList& changedCells);
+    void revealConnectedCells(int row, int col, CellList &changedCells);
 
     // on a loss, uncovers every mine so the player can see the full layout.
-    void revealAllMines(CellList& changedCells);
+    void revealAllMines(CellList &changedCells);
 
     // true when every non-mine cell has been uncovered.
     bool allSafeCellsUncovered() const;
+
+    // Jack Larson 10/8/2026
+    // quick implementation, will probably be replaced when algo 2 is done
+    int getAdjacentCoveredCount(int row, int col) const;
+
+    // Jack Larson 10/8/2026
+    // quick implementation, will probably be replaced when algo 2 is done
+    std::pair<int, int> getFirstAdjacentCoveredUnflagged(int row, int col) const;
+
+    // Jack Larson 10/8/2026
+    // quick implementation, will probably be replaced when algo 2 is done
+    int getAdjacentFlaggedCount(int row, int col) const;
+
+    // Jack Larson 10/8/2026
+    // returns the target to click to solve 1 2 1 condition
+    std::pair<int, int> targetFromOneTwoOne() const;
+
+    // Jack Larson 10/8/2026
+    // returns the best move based on algorithm 3
+    std::tuple<int, int, ClickType> difficultyThreeBestMove() const;
 };
 
 #endif

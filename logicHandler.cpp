@@ -41,54 +41,72 @@ void LogicHandler::reset(int numMines) {
     m_gameTimer.reset();
 }
 
- // how many flags the player still has to place
-int LogicHandler::flagsRemaining() const {
+// how many flags the player still has to place
+int LogicHandler::flagsRemaining() const
+{
     return board.getTotalMines() - board.getTotalFlags(); // total mines minus flags already placed
 }
 
 // entry point for all player input. Returns the cells the UI must repaint.
-CellList LogicHandler::handleClick(int row, int col, ClickType clickType) {
-    CellList changedCells; // list of cells we touched, starts empty 
+CellList LogicHandler::handleClick(int row, int col, ClickType clickType)
+{
 
-    if (m_state != GameState::Playing) { // if the game is already won or lost
+    // Jack Larson
+    // 10/8/2026
+    // dummy code that replaces user clicks with algo clicks :)
+    // std::tuple<int, int, ClickType> algo3click = difficultyThreeBestMove();
+    // row = std::get<0>(algo3click);
+    // col = std::get<1>(algo3click);
+    // clickType = std::get<2>(algo3click);
+
+    CellList changedCells; // list of cells we touched, starts empty
+
+    if (m_state != GameState::Playing)
+    { // if the game is already won or lost
         return changedCells;
     }
 
-    if (!board.isValidCoordinate(row, col)) { // if the click is outside the grid
+    if (!board.isValidCoordinate(row, col))
+    { // if the click is outside the grid
         return changedCells;
     }
 
-    if (clickType == ClickType::Right) { // right click
-        const Cell& cell = board.getCell(row, col); // grab a read-only reference to the clicked cell
-        if (cell.isCovered() || cell.isFlagged()) { // only covered/flagged cells can be flagged or un-flagged
-            board.toggleFlag(row, col); // flip the flag on/off
+    if (clickType == ClickType::Right)
+    {                                               // right click
+        const Cell &cell = board.getCell(row, col); // grab a read-only reference to the clicked cell
+        if (cell.isCovered() || cell.isFlagged())
+        {                                        // only covered/flagged cells can be flagged or un-flagged
+            board.toggleFlag(row, col);          // flip the flag on/off
             changedCells.emplace_back(row, col); // mark this cell as repaint
         }
         return changedCells;
     }
 
-    if (board.getCell(row, col).isFlagged()) { // left-clicking an already flagged cell do nothing
+    if (board.getCell(row, col).isFlagged())
+    { // left-clicking an already flagged cell do nothing
         return changedCells;
     }
 
-    if (!board.getCell(row, col).isCovered()) { // left click on an already-uncovered cell does nothing
+    if (!board.getCell(row, col).isCovered())
+    { // left click on an already-uncovered cell does nothing
         return changedCells;
     }
 
     // first left click of the game decides the mine layout, so that this cell and its neighbours are guaranteed clear.
-    if (!m_minesPlaced) {
+    if (!m_minesPlaced)
+    {
         placeMines(row, col);
         computeAdjacency(); // now that mines exist, compute each cell's 0-8 number
         m_minesPlaced = true;
-        //Start timer when the first cell is clicked
+        // Start timer when the first cell is clicked
         m_gameTimer.start();
     }
 
     // re-read the cell placement above may have set its adjacency count.
-    const Cell& cell = board.getCell(row, col);
+    const Cell &cell = board.getCell(row, col);
 
-    
-    if (cell.hasMine) { // if the clicked cell is a mine
+    if (cell.hasMine)
+    {                                // if the clicked cell is a mine
         board.uncoverCell(row, col); // uncover it
         changedCells.emplace_back(row, col);
         m_state = GameState::Lost; // mark it for repaint
@@ -229,35 +247,150 @@ bool LogicHandler::allSafeCellsUncovered() const {
     return true;
 }
 
+// Jack Larson 10/8/2026
+// quick implementation, will probably be replaced when algo 2 is done
+int LogicHandler::getAdjacentCoveredCount(int row, int col) const
+{
+    int count = 0;
+    for (int x = row - 1; x < row + 2; x++)
+    {
+        for (int y = col - 1; y < col + 2; y++)
+        {
+            if (board.isValidCoordinate(x, y))
+            {
+                if (!board.getCell(x, y).isUncovered())
+                    count++;
+            }
+        }
+    }
+    return count;
+}
+
+// Jack Larson 10/8/2026
+// quick implementation, will probably be replaced when algo 2 is done
+std::pair<int, int> LogicHandler::getFirstAdjacentCoveredUnflagged(int row, int col) const
+{
+    for (int x = row - 1; x < row + 2; x++)
+    {
+        for (int y = col - 1; y < col + 2; y++)
+        {
+            if (board.isValidCoordinate(x, y))
+            {
+                if (board.getCell(x, y).isCovered())
+                    return std::pair<int, int>(x, y);
+            }
+        }
+    }
+    return std::pair<int, int>(-1, -1);
+}
+
+// Jack Larson 10/8/2026
+// quick implementation, will probably be replaced when algo 2 is done
+int LogicHandler::getAdjacentFlaggedCount(int row, int col) const
+{
+    int count = 0;
+    for (int x = row - 1; x < row + 2; x++)
+    {
+        for (int y = col - 1; y < col + 2; y++)
+        {
+            if (board.isValidCoordinate(x, y) && board.getCell(x, y).isFlagged())
+                count++;
+        }
+    }
+    return count;
+}
+
+// Jack Larson 10/8/2026
+// returns the target to click to solve 1 2 1 condition
+std::pair<int, int> LogicHandler::targetFromOneTwoOne() const
+{
+    return std::pair<int, int>();
+}
+
+// Jack Larson 10/8/2026
+// returns the best move as per algorithm 3
+std::tuple<int, int, ClickType> LogicHandler::difficultyThreeBestMove() const
+{
+    for (int x = 0; x < Board::ROWS; x++)
+    {
+        for (int y = 0; y < Board::COLL; y++)
+        {
+            if (!board.getCell(x, y).isUncovered())
+                continue;
+
+            if (getAdjacentCoveredCount(x, y) == board.getCell(x, y).numOfAdjacentMines)
+            {
+                std::pair<int, int> firstCoveredUnflagged = getFirstAdjacentCoveredUnflagged(x, y);
+                if (firstCoveredUnflagged != std::pair<int, int>(-1, -1))
+                    return std::tuple<int, int, ClickType>(firstCoveredUnflagged.first, firstCoveredUnflagged.second, ClickType::Right);
+            }
+
+            if (getAdjacentFlaggedCount(x, y) == board.getCell(x, y).numOfAdjacentMines)
+            {
+                std::pair<int, int> firstCoveredUnflagged = getFirstAdjacentCoveredUnflagged(x, y);
+                if (firstCoveredUnflagged != std::pair<int, int>(-1, -1))
+                    return std::tuple<int, int, ClickType>(firstCoveredUnflagged.first, firstCoveredUnflagged.second, ClickType::Left);
+            }
+
+            if (board.getCell(x, y).numOfAdjacentMines == 2 && getAdjacentFlaggedCount(x, y) != 2)
+            {
+                if (x == 0 || x == Board::ROWS - 1 || y == 0 || y == Board::COLL - 1)
+                    continue;
+
+                bool xClear = board.getCell(x - 1, y).isUncovered() && board.getCell(x + 1, y).isUncovered();
+                bool xOnes = board.getCell(x - 1, y).numOfAdjacentMines == 1 && board.getCell(x + 1, y).numOfAdjacentMines == 1;
+                bool yClear = board.getCell(x, y - 1).isUncovered() && board.getCell(x, y + 1).isUncovered();
+                bool yOnes = board.getCell(x, y - 1).numOfAdjacentMines == 1 && board.getCell(x, y + 1).numOfAdjacentMines == 1;
+                if (xClear && xOnes || yClear && yOnes)
+                {
+                    if (board.getCell(x - 1, y - 1).isCovered())
+                        return std::tuple<int, int, ClickType>(x - 1, y - 1, ClickType::Right);
+                    if (board.getCell(x + 1, y - 1).isCovered())
+                        return std::tuple<int, int, ClickType>(x + 1, y - 1, ClickType::Right);
+                    if (board.getCell(x + 1, y + 1).isCovered())
+                        return std::tuple<int, int, ClickType>(x + 1, y + 1, ClickType::Right);
+                    if (board.getCell(x - 1, y + 1).isCovered())
+                        return std::tuple<int, int, ClickType>(x - 1, y + 1, ClickType::Right);
+                }
+            }
+        }
+    }
+
+    return std::tuple<int, int, ClickType>(0, 0, ClickType::Left);
+}
+
 // 10/6/2026 Tyler Oswald
-//This function is used by the UI to get the current time 
-GameTimer* LogicHandler::getGameTimer()
+// This function is used by the UI to get the current time
+GameTimer *LogicHandler::getGameTimer()
 {
     return &m_gameTimer;
 }
 
-//Wrote with the help of ChatGPT (Open AI) - Tyler 10/6/2026
-//This function ends the game when time runs out in the timed mode
-void LogicHandler::timeExpired(){
-    //If the game is already over, we don't need to run this again 
-    if (m_state != GameState::Playing) { 
+// Wrote with the help of ChatGPT (Open AI) - Tyler 10/6/2026
+// This function ends the game when time runs out in the timed mode
+void LogicHandler::timeExpired()
+{
+    // If the game is already over, we don't need to run this again
+    if (m_state != GameState::Playing)
+    {
         return;
     }
 
-    //Update the game state to reflect the loss 
+    // Update the game state to reflect the loss
     m_state = GameState::Lost;
-    //Stop the timer 
+    // Stop the timer
     m_gameTimer.stop();
 
-    //Make an empty cellist object to pass to revealAllMines
+    // Make an empty cellist object to pass to revealAllMines
     CellList ignored;
-    //Display the remaining mines on game loss 
+    // Display the remaining mines on game loss
     revealAllMines(ignored);
 }
 
 // Tyler - 10/6/2026
-//This function sets the countdown time in the timer class
-void LogicHandler::setTimeLimit(bool timed, int seconds){
-    //Set the time for the timer
+// This function sets the countdown time in the timer class
+void LogicHandler::setTimeLimit(bool timed, int seconds)
+{
+    // Set the time for the timer
     m_gameTimer.setCountdown(timed, seconds);
 }
