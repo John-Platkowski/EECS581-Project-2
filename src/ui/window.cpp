@@ -23,9 +23,13 @@
 #include "gridwidget.h"
 #include "infobar.h"
 
-#include <QInputDialog>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QDialog>
+#include <QFormLayout>
+#include <QSpinBox>
+#include <QComboBox>
+#include <QDialogButtonBox>
 
 Window::Window(QWidget *parent)
     : QMainWindow(parent)
@@ -36,8 +40,9 @@ Window::Window(QWidget *parent)
     // create ui
     setupUi();
 
-    // Ask for the mine count and deal the first board.
-    m_gridWidget->startNewGame(askMineCount(),true,10);
+    // Ask for the game settings and deal the first board.
+    const GameSettings s = askGameSettings();
+    m_gridWidget->startNewGame(s.mines, s.new_mode, s.start_time);
 }
 
 Window::~Window() = default;
@@ -83,28 +88,55 @@ void Window::setupUi()
     setWindowTitle("Minesweeper");
 }
 
-// Modal prompt constrained to the 10-20 range the specification requires, so an
-// out-of-range mine count cannot reach the Game Logic at all.
-int Window::askMineCount()
+// Modal dialog for every new-game option in one window. 
+GameSettings Window::askGameSettings()
 {
-    bool ok = false;
-    const int mines = QInputDialog::getInt(
-        this,
-        "New Game",
-        "Number of mines (10 - 20):",
-        10,   // default
-        10,   // minimum
-        20,   // maximum
-        1,    // step
-        &ok);
+    QDialog dlg(this);
+    dlg.setWindowTitle("New Game");
+    QFormLayout *form = new QFormLayout(&dlg);
 
-    // Cancelling still starts a playable game rather than an empty window.
-    return ok ? mines : 10;
+    QSpinBox *mines = new QSpinBox(&dlg);
+    mines->setRange(10, 20);
+    mines->setValue(10);
+    form->addRow("Number of mines:", mines);
+
+    QComboBox *mode = new QComboBox(&dlg);
+    mode->addItems({"Classic", "Timed"});
+    form->addRow("Game mode:", mode);
+
+    QSpinBox *time = new QSpinBox(&dlg);
+    time->setRange(10, 600);
+    time->setValue(120);
+    form->addRow("Time limit in seconds:", time);
+
+    QComboBox *aiMode = new QComboBox(&dlg);
+    aiMode->addItems({"Off","Interactive","Automatic"});
+    form->addRow("AI mode:", aiMode);
+
+    QComboBox *aiDiff = new QComboBox(&dlg);
+    aiDiff->addItems({"Easy", "Medium", "Hard"});
+    form->addRow("AI difficulty:", aiDiff);
+
+    QDialogButtonBox *buttons = new QDialogButtonBox(
+        QDialogButtonBox::Ok, &dlg);
+    form->addRow(buttons);
+    connect(buttons, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
+    dlg.exec();
+
+    // On cancel return the default
+    GameSettings s;                     
+    s.mines = mines->value();
+    s.new_mode = (mode->currentIndex() == 1);
+    s.start_time = time->value();
+    s.aiMode = static_cast<AiMode>(aiMode->currentIndex());
+    s.aiDifficulty = static_cast<AiDifficulty>(aiDiff->currentIndex());
+    return s;
 }
 
 void Window::promptNewGame()
 {
-    m_gridWidget->startNewGame(askMineCount(),true,10);
+    const GameSettings s = askGameSettings();
+    m_gridWidget->startNewGame(s.mines, s.new_mode, s.start_time);
 }
 
 // Added with assistance from ChatGPT (OpenAI), 2026-10-01.

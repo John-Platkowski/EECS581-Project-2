@@ -25,6 +25,17 @@ class GridWidget;
 class InfoBar;
 class QPushButton;
 
+enum class AiMode { Off, Interactive, Automatic };
+enum class AiDifficulty { Easy, Medium, Hard };
+
+struct GameSettings {
+    int mines;
+    bool new_mode;
+    int start_time;
+    AiMode aiMode;
+    AiDifficulty aiDifficulty;
+};
+
 class Window : public QMainWindow
 {
     Q_OBJECT
@@ -37,15 +48,16 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
 
 private slots:
-    // Prompts for a mine count and restarts the game with it.
+    // Opens the new-game dialog and restarts the game with the chosen settings.
     void promptNewGame();
 
 private:
     void setupUi();
 
-    // Modal prompt for the mine count. Returns a value in [10, 20]; if the
-    // player cancels, the default of 10 is used so a game always starts.
-    int askMineCount();
+    // Modal dialog for the new-game options (mines, mode, AI).
+    // Returns the player's choices. If they cancel, defaults are returned so
+    // a game always starts.
+    GameSettings askGameSettings();
 
     GridWidget *m_gridWidget = nullptr;
     InfoBar *m_infoBar = nullptr;
