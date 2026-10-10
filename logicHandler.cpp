@@ -307,9 +307,67 @@ std::pair<int, int> LogicHandler::targetFromOneTwoOne() const
     return std::pair<int, int>();
 }
 
+// John Platkowski 10/10/2026
+// Picks a random unflagged, covered cell
+std::tuple<int, int, ClickType> LogicHandler::randomCoveredMove()
+{
+    std::vector<std::pair<int, int>> candidates;
+    for (int x = 0; x < Board::ROWS; x++)
+    {
+        for (int y = 0; y < Board::COLL; y++)
+        {
+            if (board.getCell(x, y).isCovered())
+                candidates.emplace_back(x, y);
+        }
+    }
+
+    if (candidates.empty())
+        return std::tuple<int, int, ClickType>(-1, -1, ClickType::Left);
+
+    std::uniform_int_distribution<size_t> pick(0, candidates.size() - 1);
+    std::pair<int, int> target = candidates[pick(m_rng)];
+    return std::tuple<int, int, ClickType>(target.first, target.second, ClickType::Left);
+}
+
+// John Platkowski 10/10/2026
+// Returns the best move as per algorithm 1; random covered cell 
+std::tuple<int, int, ClickType> LogicHandler::difficultyOneBestMove()
+{
+    return randomCoveredMove();
+}
+
+// John Platkowski 10/10/2026
+// Returns the best move as per algorithm 2; flag any guaranteed flags, or click any guaranteed safe, or click a random cell
+std::tuple<int, int, ClickType> LogicHandler::difficultyTwoBestMove()
+{
+    for (int x = 0; x < Board::ROWS; x++)
+    {
+        for (int y = 0; y < Board::COLL; y++)
+        {
+            if (!board.getCell(x, y).isUncovered())
+                continue;
+
+            std::pair<int, int> firstCoveredUnflagged = getFirstAdjacentCoveredUnflagged(x, y);
+            if (firstCoveredUnflagged == std::pair<int, int>(-1, -1))
+                continue;
+
+            // Hidden neighbors equal the number, so they must be flagged
+            if (getAdjacentCoveredCount(x, y) == board.getCell(x, y).numOfAdjacentMines)
+                return std::tuple<int, int, ClickType>(firstCoveredUnflagged.first, firstCoveredUnflagged.second, ClickType::Right);
+
+            // Flagged neighbors equal the number, so the rest are safe and must be clicked
+            if (getAdjacentFlaggedCount(x, y) == board.getCell(x, y).numOfAdjacentMines)
+                return std::tuple<int, int, ClickType>(firstCoveredUnflagged.first, firstCoveredUnflagged.second, ClickType::Left);
+        }
+    }
+
+    return randomCoveredMove();
+}
+
 // Jack Larson 10/8/2026
 // returns the best move as per algorithm 3
-std::tuple<int, int, ClickType> LogicHandler::difficultyThreeBestMove() const
+// John Platkowski 10/10/2026 changed fallback to random covered cell
+std::tuple<int, int, ClickType> LogicHandler::difficultyThreeBestMove()
 {
     for (int x = 0; x < Board::ROWS; x++)
     {
@@ -356,7 +414,7 @@ std::tuple<int, int, ClickType> LogicHandler::difficultyThreeBestMove() const
         }
     }
 
-    return std::tuple<int, int, ClickType>(0, 0, ClickType::Left);
+    return randomCoveredMove();
 }
 
 // 10/6/2026 Tyler Oswald

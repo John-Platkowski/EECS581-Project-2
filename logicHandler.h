@@ -23,6 +23,7 @@
 #include "gameTimer.h"
 
 #include <random>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -71,7 +72,21 @@ public:
 
     //Function used to set the amount of time for the timed mode
     void setTimeLimit(bool timed, int seconds);
-    
+
+
+    // John Platkowski 10/10/26
+    // Will make Jack's function public when hooking difficulties up to the UI
+    // Returns the best move based on algorithm 1
+    std::tuple<int, int, ClickType> difficultyOneBestMove();
+
+    // Returns the best move based on algorithm 2
+    std::tuple<int, int, ClickType> difficultyTwoBestMove();
+
+    // Jack Larson 10/8/2026
+    // returns the best move based on algorithm 3
+    // John Platkowski 10/10/2026 function is no longer const or private
+    std::tuple<int, int, ClickType> difficultyThreeBestMove();
+
 private:
     Board& board;          // board manager this handler drives.
     GameState m_state;     // Playing / Won / Lost.
@@ -114,9 +129,10 @@ private:
     // returns the target to click to solve 1 2 1 condition
     std::pair<int, int> targetFromOneTwoOne() const;
 
-    // Jack Larson 10/8/2026
-    // returns the best move based on algorithm 3
-    std::tuple<int, int, ClickType> difficultyThreeBestMove() const;
+    // John Platkowski 10/10/2026
+    // Picks a random unflagged, covered cell to left click, returns (-1, -1) if there is none.
+    std::tuple<int, int, ClickType> randomCoveredMove();
+
 };
 
 #endif
