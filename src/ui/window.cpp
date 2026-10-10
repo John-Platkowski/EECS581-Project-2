@@ -42,7 +42,7 @@ Window::Window(QWidget *parent)
 
     // Ask for the game settings and deal the first board.
     const GameSettings s = askGameSettings();
-    m_gridWidget->startNewGame(s.mines, s.new_mode, s.start_time);
+    m_gridWidget->startNewGame(s.mines, s.new_mode, s.start_time, s.aiMode, s.aiDifficulty);
 }
 
 Window::~Window() = default;
@@ -136,7 +136,7 @@ GameSettings Window::askGameSettings()
 void Window::promptNewGame()
 {
     const GameSettings s = askGameSettings();
-    m_gridWidget->startNewGame(s.mines, s.new_mode, s.start_time);
+    m_gridWidget->startNewGame(s.mines, s.new_mode, s.start_time, s.aiMode, s.aiDifficulty);
 }
 
 // Added with assistance from ChatGPT (OpenAI), 2026-10-01.

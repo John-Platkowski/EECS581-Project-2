@@ -75,7 +75,6 @@ public:
 
 
     // John Platkowski 10/10/26
-    // Will make Jack's function public when hooking difficulties up to the UI
     // Returns the best move based on algorithm 1
     std::tuple<int, int, ClickType> difficultyOneBestMove();
 

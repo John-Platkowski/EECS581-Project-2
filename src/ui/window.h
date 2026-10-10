@@ -18,15 +18,13 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "gridwidget.h"
+
 #include <QMainWindow>
 #include <QLabel>
 
-class GridWidget;
 class InfoBar;
 class QPushButton;
-
-enum class AiMode { Off, Interactive, Automatic };
-enum class AiDifficulty { Easy, Medium, Hard };
 
 struct GameSettings {
     int mines;

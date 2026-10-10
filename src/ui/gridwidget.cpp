@@ -35,6 +35,10 @@ GridWidget::GridWidget(QWidget *parent)
 {
     setupUi();
     connect(m_logic.getGameTimer(), &GameTimer::timeChanged, this, &GridWidget::onTimeChanged);
+
+    m_aiTimer.setSingleShot(true);
+    m_aiTimer.setInterval(kAiMoveDelayMs);
+    connect(&m_aiTimer, &QTimer::timeout, this, &GridWidget::playAiMove);
 }
 
 // draws the grid: column letters A-J across the top, row numbers 1-10 down the
@@ -86,8 +90,14 @@ void GridWidget::setupUi()
 
 // begin a new game: rebuild the board, clear every tile, and republish counters.
 // Added a flag for timed mode and what the start time should be - Tyler 10/6/2026
-void GridWidget::startNewGame(int numMines, bool timed, int start_time)
+// Integrated AI mode and difficulty - John 10/10/2026
+void GridWidget::startNewGame(int numMines, bool timed, int start_time, AiMode aiMode, AiDifficulty aiDifficulty)
 {
+    // Drop any AI move still pending from the previous game
+    m_aiTimer.stop();
+    m_aiMode = aiMode;
+    m_aiDifficulty = aiDifficulty;
+
     //Set the flag for if we are playing the timed mode
     m_timedMode = timed;
     //Added logic for setting the countdown timer
@@ -99,6 +109,11 @@ void GridWidget::startNewGame(int numMines, bool timed, int start_time)
 
     emit flagsRemainingChanged(m_logic.flagsRemaining());
     emit statusChanged(m_logic.state());
+
+    // Begin AI move loop if in automatic mode
+    if (m_aiMode == AiMode::Automatic) {
+        m_aiTimer.start();
+    }
 }
 
 //Wrote with the help of ChatGPT (OpenAI) - Tyler 10/6/2026
@@ -133,11 +148,26 @@ void GridWidget::handleTileClicked(Tile *tile, Qt::MouseButton clickType)
         return;
     }
 
+    // Prevent input in automatic AI mode
+    if (m_aiMode == AiMode::Automatic || m_aiTimer.isActive()) {
+        return;
+    }
+
     const ClickType click =
         (clickType == Qt::RightButton) ? ClickType::Right : ClickType::Left;
 
+    const bool changed = applyClick(tile->row(), tile->col(), click);
+
+    // Player cell left click passes turn to the AI
+    if (m_aiMode == AiMode::Interactive && click == ClickType::Left && changed && m_logic.state() == GameState::Playing) {
+        m_aiTimer.start();
+    }
+}
+
+bool GridWidget::applyClick(int row, int col, ClickType click)
+{
     const GameState before = m_logic.state();
-    const CellList changed = m_logic.handleClick(tile->row(), tile->col(), click);
+    const CellList changed = m_logic.handleClick(row, col, click);
 
     for (const auto &coord : changed) {
         refreshTile(coord.first, coord.second);
@@ -148,6 +178,46 @@ void GridWidget::handleTileClicked(Tile *tile, Qt::MouseButton clickType)
 
     if (m_logic.state() != before) {
         emit statusChanged(m_logic.state());
+    }
+
+    return !changed.empty();
+}
+
+// John Platkowski 10/10/2026
+// Apply the correct AI move based on difficulty
+void GridWidget::playAiMove()
+{
+    if (m_logic.state() != GameState::Playing) 
+    {
+        return;
+    }
+
+    std::tuple<int, int, ClickType> move;
+    switch (m_aiDifficulty) 
+    {
+        case AiDifficulty::Easy:
+            move = m_logic.difficultyOneBestMove(); 
+            break;
+        case AiDifficulty::Medium:
+            move = m_logic.difficultyTwoBestMove(); 
+            break;
+        case AiDifficulty::Hard:   
+            move = m_logic.difficultyThreeBestMove(); 
+            break;
+    }
+
+    bool moved = applyClick(std::get<0>(move), std::get<1>(move), std::get<2>(move));
+
+    // If any mode fails to return a decision, apply a random click
+    if (!moved) 
+    {
+        move = m_logic.difficultyOneBestMove();
+        moved = applyClick(std::get<0>(move), std::get<1>(move), std::get<2>(move));
+    }
+    
+    if (m_aiMode == AiMode::Automatic && moved && m_logic.state() == GameState::Playing) 
+    {
+        m_aiTimer.start();
     }
 }
 

@@ -21,7 +21,7 @@
  *          statusChanged(GameState) signals consumed by the InfoBar.
  *
  * External sources: game wiring added with assistance from Claude (Anthropic),
- * a generative AI assistant, 2026-09-17.
+ * a generative AI assistant, 2026-09-17 and 2026-10-10.
  */
 #ifndef GRIDWIDGET_H
 #define GRIDWIDGET_H
@@ -31,8 +31,12 @@
 
 #include <QWidget>
 #include <QVector>
+#include <QTimer>
 
 class Tile;
+// John Platkowski 10/10/2026 migrate AI enums from window class
+enum class AiMode { Off, Interactive, Automatic };
+enum class AiDifficulty { Easy, Medium, Hard };
 
 class GridWidget : public QWidget
 {
@@ -44,7 +48,7 @@ public:
     static constexpr int kGridSize = 10;
 
     // Clears the board and begins a new game with the given mine count (10-20).
-    void startNewGame(int numMines, bool timed = false, int start_time = 120);
+    void startNewGame(int numMines, bool timed = false, int start_time = 120, AiMode aiMode = AiMode::Off, AiDifficulty aiDifficulty = AiDifficulty::Easy);
 
 signals:
     // Emitted whenever a flag is placed or removed (total mines - flags placed).
@@ -59,8 +63,14 @@ private slots:
     void handleTileClicked(Tile *tile, Qt::MouseButton clickType);
     void onTimeChanged(int seconds);
 
+    // Plays one AI move, then re-arms itself in Automatic mode.
+    void playAiMove();
+
 private:
     void setupUi();
+
+    // Sends one click to the Game Logic, repaints changed cells
+    bool applyClick(int row, int col, ClickType click);
 
     // Reads one cell from the Board and pushes its appearance into its Tile.
     void refreshTile(int row, int col);
@@ -75,6 +85,14 @@ private:
     Board m_board;
     LogicHandler m_logic;
     bool m_timedMode = false; 
+
+    // Delay before each AI move
+    static constexpr int kAiMoveDelayMs = 400;
+
+    AiMode m_aiMode = AiMode::Off;
+    AiDifficulty m_aiDifficulty = AiDifficulty::Easy;
+    // One shot, precludes player input while active
+    QTimer m_aiTimer;
 };
 
 #endif
