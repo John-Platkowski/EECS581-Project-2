@@ -89,6 +89,8 @@ void Window::setupUi()
 }
 
 // Modal dialog for every new-game option in one window. 
+//Nickan Safi 10/10/26
+//Override other settings if using new mode
 GameSettings Window::askGameSettings()
 {
     QDialog dlg(this);
@@ -130,6 +132,10 @@ GameSettings Window::askGameSettings()
     s.start_time = time->value();
     s.aiMode = static_cast<AiMode>(aiMode->currentIndex());
     s.aiDifficulty = static_cast<AiDifficulty>(aiDiff->currentIndex());
+    if (s.new_mode) {
+        s.mines = 10;
+        s.aiMode = AiMode::Off;
+    }
     return s;
 }
 

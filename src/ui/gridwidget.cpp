@@ -164,6 +164,8 @@ void GridWidget::handleTileClicked(Tile *tile, Qt::MouseButton clickType)
     }
 }
 
+//Nickan Safi 10/10/26
+//If using the new game mode, update the board to a full one with a calculated number of mines
 bool GridWidget::applyClick(int row, int col, ClickType click)
 {
     const GameState before = m_logic.state();
@@ -178,6 +180,18 @@ bool GridWidget::applyClick(int row, int col, ClickType click)
 
     if (m_logic.state() != before) {
         emit statusChanged(m_logic.state());
+        if (m_logic.state() == GameState::Won && m_timedMode) {
+            int newMines;
+            if (m_board.getTotalMines() < 30) {
+                newMines = m_board.getTotalMines() + 2;
+            } else {
+                newMines = 30;
+            }
+            m_logic.reset(newMines);
+            emit statusChanged(m_logic.state());
+            emit flagsRemainingChanged(m_logic.flagsRemaining());
+            refreshAllTiles();
+        }
     }
 
     return !changed.empty();

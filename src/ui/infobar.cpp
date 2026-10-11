@@ -55,6 +55,8 @@ void InfoBar::setTime(int seconds)
 
 // Compose the single status line. Colour doubles as a second signal of the
 // outcome for players who are scanning rather than reading.
+//Nickan Safi 10/10/26
+//Change playing status color from white to blue for compatibility with a white background color
 void InfoBar::updateText()
 {
     QString status;
@@ -63,7 +65,7 @@ void InfoBar::updateText()
     switch (m_state) {
         case GameState::Playing:
             status = "Playing";
-            color = "white";
+            color = "blue";
             break;
         case GameState::Won:
             status = "Victory!";
