@@ -1,0 +1,82 @@
+flowchart TB
+    User["User"]
+
+    subgraph GUI["Frontend — Qt GUI"]
+        Display["Display board, cell states,<br/>game outcome, and timer"]
+        AIInput["AI mode / difficulty selection"]
+    end
+
+    subgraph Logic["Game Logic — LogicHandler"]
+        Handle["handleClick()"]
+        Reset["reset(int numMines)"]
+        WinCheck["allSafeCellsUncovered()"]
+        RevealMines["revealAllMines()"]
+        Timeout["timeExpired()"]
+        State["m_state: GameState<br/>Playing · Won · Lost"]
+        TimerConfig["setTimeLimit(bool timed, int seconds)"]
+
+        subgraph AI["AI Move Selection"]
+            Easy["difficultyOneBestMove()"]
+            Medium["difficultyTwoBestMove()"]
+            Hard["difficultyThreeBestMove()"]
+            Move["Suggested move<br/>(row, column, ClickType)"]
+
+            Easy --> Move
+            Medium --> Move
+            Hard --> Move
+        end
+    end
+
+    subgraph BoardComponent["Board"]
+        BoardFunctions["getCell() · placeMine()<br/>toggleFlag() · uncoverCell()<br/>setNumAdjMine()"]
+        Cells["Cell objects<br/>State · Mine status · Adjacent mine count"]
+    end
+
+    subgraph Timer["GameTimer"]
+        TimerFunctions["start() · stop() · reset()<br/>setCountdown()"]
+        Adjustments["revealSquare()<br/>correctFlag() · incorrectFlag()<br/>correctUnflag()"]
+        Signal["timeChanged(int seconds)"]
+    end
+
+    User --> GUI
+    GUI -->|"Mouse coordinates and ClickType"| Handle
+
+    Handle <-->|"Read cell data / update board"| BoardFunctions
+    BoardFunctions --- Cells
+
+    Handle -->|"After a safe reveal"| WinCheck
+    WinCheck -->|"All safe cells uncovered"| State
+    Handle -->|"Mine hit"| State
+    State -->|"Lost"| RevealMines
+    Timeout -->|"Set state to Lost"| State
+    Timeout --> RevealMines
+
+    Handle -->|"Changed cells (CellList)"| Display
+    State -->|"Updated game outcome"| Display
+
+    Reset -->|"Reinitialize board"| BoardComponent
+    Reset -->|"Reset game state"| State
+    Reset -->|"Reset timer"| TimerFunctions
+
+    Handle -->|"Start / stop timer"| TimerFunctions
+    Handle --> Adjustments
+    TimerConfig --> TimerFunctions
+    TimerFunctions --> Signal
+    Signal -->|"Update displayed time"| Display
+
+    GUI -.->|"Request AI move"| AI
+    Move -.->|"Process suggested move"| Handle
+
+    Timer -.->|"Countdown reaches zero"| Timeout
+
+    classDef gui fill:#dbeafe,stroke:#2563eb,color:#172554,stroke-width:2px
+    classDef logic fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:2px
+    classDef board fill:#cffafe,stroke:#0891b2,color:#164e63,stroke-width:2px
+    classDef timer fill:#f3e8ff,stroke:#9333ea,color:#581c87,stroke-width:2px
+    classDef ai fill:#ffedd5,stroke:#ea580c,color:#7c2d12,stroke-width:2px
+
+    class Display,AIInput gui
+    class Handle,Reset,WinCheck,RevealMines,Timeout,State,TimerConfig logic
+    class BoardFunctions,Cells board
+    class TimerFunctions,Adjustments,Signal timer
+    class Easy,Medium,Hard,Move ai

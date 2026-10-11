@@ -55,7 +55,3 @@
 - Timer adjustments can modify the current time when cells are revealed or flags are placed correctly or incorrectly.
 - The game can be lost by revealing a mine or through timed-mode expiration. A win occurs when all non-mine cells have been uncovered.
 - The AI difficulty strategies select moves based on the current board state. Difficulty One uses random selection, Difficulty Two applies basic adjacent-cell rules, and Difficulty Three applies additional pattern-based rules before falling back to random selection.
-
-**Implementation notes:** In the supplied `GameTimer` code, `updateTime()` prevents the countdown from dropping below zero, but the shown function does not itself call `LogicHandler::timeExpired()`. Verify that the zero-time condition is connected to that method elsewhere in the implementation before describing automatic timeout handling as fully implemented.
-
-The supplied AI methods return suggested moves; the code snippets alone do not establish whether the GUI already invokes those methods and executes their returned moves. Treat that interaction as intended flow unless the integration has been confirmed.
