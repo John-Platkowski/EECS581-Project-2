@@ -74,9 +74,14 @@ CellList LogicHandler::handleClick(int row, int col, ClickType clickType)
     if (clickType == ClickType::Right)
     {                                               // right click
         const Cell &cell = board.getCell(row, col); // grab a read-only reference to the clicked cell
+
         if (cell.isCovered() || cell.isFlagged())
         {                                        // only covered/flagged cells can be flagged or un-flagged
+            const bool wasFlagged = cell.isFlagged(); //store flag states
+            const bool containsMine = cell.hasMine;
+            
             board.toggleFlag(row, col);          // flip the flag on/off
+            adjustFlagTimer(wasFlagged, containsMine);
             changedCells.emplace_back(row, col); // mark this cell as repaint
         }
         return changedCells;
@@ -118,6 +123,7 @@ CellList LogicHandler::handleClick(int row, int col, ClickType clickType)
 
     if (board.uncoverCell(row, col)) {
         changedCells.emplace_back(row, col); // try to uncover the safe cell
+        m_gameTimer.revealSquare(); //tell timer square was revealed
     }
 
     // a cell with no adjacent mines opens up its whole connected region.
@@ -451,4 +457,21 @@ void LogicHandler::setTimeLimit(bool timed, int seconds)
 {
     // Set the time for the timer
     m_gameTimer.setCountdown(timed, seconds);
+}
+//Joshua - 10/10/26
+//This decides the flag adjustment result
+void LogicHandler::adjustFlagTimer(bool wasFlagged, bool hasMine)
+{
+    if (wasFlagged)
+    {
+        if (hasMine)
+            m_gameTimer.correctUnflag();
+    }
+    else
+    {
+        if (hasMine)
+            m_gameTimer.correctFlag();
+        else
+            m_gameTimer.incorrectFlag();
+    }
 }

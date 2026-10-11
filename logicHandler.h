@@ -132,6 +132,10 @@ private:
     // Picks a random unflagged, covered cell to left click, returns (-1, -1) if there is none.
     std::tuple<int, int, ClickType> randomCoveredMove();
 
+    //Joshua Lin 10/10/26
+    //This will be used to decide what flag timer award it should get (wrong/right)
+    void adjustFlagTimer(bool wasFlagged, bool hasMine);
+
 };
 
 #endif
