@@ -7,7 +7,7 @@
 /**
  * @file window.cpp
  * @brief Implementation of the top-level application window.
- * @author Jaydee Brown (original window), Will Godderz (game setup + documentation), Trey Timko (configured the game setup to allow for further customization, 2026-10-09)
+ * @author Jaydee Brown (original window), Will Godderz (game setup + documentation), Trey Timko (configured the game setup to allow for further customization, 2026-10-09), Nickan Safi (timed mode settings override, 10/10/26-10/11/26)
  * @date 2026-09-17
  *
  * Builds the window layout, prompts for the mine count, ai, and mode settings at startup and on each
