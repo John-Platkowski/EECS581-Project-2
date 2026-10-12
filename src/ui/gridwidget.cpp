@@ -166,7 +166,7 @@ void GridWidget::handleTileClicked(Tile *tile, Qt::MouseButton clickType)
 
 //Nickan Safi 10/10/26
 //If using the new game mode, update the board to a full one with a calculated number of mines
-//Internal comments added 10/11/26
+//Added some internal comments 10/11/26
 bool GridWidget::applyClick(int row, int col, ClickType click)
 {
     const GameState before = m_logic.state();
