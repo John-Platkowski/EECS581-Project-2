@@ -166,7 +166,6 @@ void GridWidget::handleTileClicked(Tile *tile, Qt::MouseButton clickType)
 
 //Nickan Safi 10/10/26
 //If using the new game mode, update the board to a full one with a calculated number of mines
-//Internal comments added 10/11/26
 bool GridWidget::applyClick(int row, int col, ClickType click)
 {
     const GameState before = m_logic.state();
@@ -183,15 +182,12 @@ bool GridWidget::applyClick(int row, int col, ClickType click)
         emit statusChanged(m_logic.state());
         if (m_logic.state() == GameState::Won && m_timedMode) {
             int newMines;
-            //Make sure mines do not go above a limit
             if (m_board.getTotalMines() < 30) {
                 newMines = m_board.getTotalMines() + 2;
             } else {
                 newMines = 30;
             }
-            //Make the board with the new number of mines
             m_logic.reset(newMines);
-            //Do starting procedures for a new game
             emit statusChanged(m_logic.state());
             emit flagsRemainingChanged(m_logic.flagsRemaining());
             refreshAllTiles();

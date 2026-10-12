@@ -10,6 +10,4 @@ John, 10/10/2026, 3:30pm, 5:00pm, 1.5h, Added algorithms 1 and 2
 John, 10/10/2026, 5:30pm, 6:15pm, 45m, Integrated AI modes with UI
 Lena, 10/06/2026, 5:30pm, 6:30pm, 1h, Created inital game timer class to allow incremementing based on board actions. 
 Josh, 10/10/2026, 7:00pm, 9:00pm, 2h, Fixed inital timer mode, cleaned up and created final documents
-Nickan, 10/10/2026, 5:00pm, 6:00pm, 1h, Started implementing new game mode
-Nickan, 10/10/2026, 10:30pm, 11:30pm, 1h, Implemented functioning new game mode
-Nickan, 10/11/2026, 8:00pm, 8:30pm, 30m, Checked for bugs and added more comments
+Nickan, 10/10/2026, 5:00pm, 6:00pm, 10:30pm, 11:30pm, 2h, Implemented new game mode
